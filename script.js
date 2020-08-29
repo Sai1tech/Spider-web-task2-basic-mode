@@ -214,11 +214,12 @@ function result() {
 	document.querySelector('body').style["background-color"] = "powderblue";
 	document.querySelector('#resulttext').style.fontFamily = "Balsamiq Sans, cursive";
 	document.querySelector('h1').textContent = "QUIZ RESULT";
-	document.querySelector('#resulttext').innerHTML = "YOUR SCORE IS " + "'" + marks + "'";
+	document.querySelector('#resulttext').innerHTML = "YOUR SCORE IS " + "'" + marks + "' OUT OF 1200";
 }
 
 function undoresultcontainer() {
 	document.querySelector('.resultcontainer').style.display = "initial";
+	marks*=100;
 	result();
 }
 
