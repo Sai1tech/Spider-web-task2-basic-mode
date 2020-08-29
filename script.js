@@ -2,12 +2,13 @@ var marks=0;
 var i=0;
 var qn = new Array();
 const choices = Array.from(document.querySelectorAll(".choice"));
-var acceptingAnswers=true;
+const qnnumber = Array.from(document.querySelectorAll(".qnnumber"));
 var answered = [1,1,1,1,1,1,1,1,1,1,1,1];
 var selectedchoice = new Array();
 window.onload = document.getElementById('submit').style.display = "none";
 window.onload = document.querySelector('.resultcontainer').style.display = "none";
-
+window.onload = document.querySelector('.quiz').style.display = "none";
+window.onload = document.querySelector('body').classList.add('bgcolor');
 qn[0]={
 	q: "How long does the novel coronavirus survive outside the body?",
 	a: "A week in the air and on surfaces",
@@ -22,7 +23,7 @@ qn[1]={
 	a: "Frequent hand-washing",   // (ANSWER)
 	b: "Wearing a face mask",
 	c: "Exercising regularly",
-	d: "Eating tasty food",
+	d: "Eating fast foods",
 	ans: 1,
 }
 
@@ -38,10 +39,10 @@ qn[2]={
 qn[3]={
 	q: "What a fomite?",
 	a: "A hospital-grade disinfectant",
-	b: "A contaminated object or surface",   // (ANSWER)
+	b: "An immunity-boosting supplement",
 	c: "A disease carrier",
-	d: "An immunity-boosting supplement",
-	ans: 2,
+	d: "A contaminated object or surface",   // (ANSWER)
+	ans: 4,
 }
 
 qn[4]={
@@ -101,10 +102,10 @@ qn[9]={
 qn[10]={
 	q: "How many countries, areas or territories are suffering from novel coronavirus outbreak in the World?",
 	a: "More than 50",
-	b: "More than 100",
+	b: "More than 200",   // (ANSWER)
 	c: "More than 150",
-	d: "More than 200",   // (ANSWER)
-	ans: 4,
+	d: "More than 100",
+	ans: 2,
 }
 
 qn[11]={
@@ -116,23 +117,28 @@ qn[11]={
 	ans: 4,
 }
 
-qn[12]={
-	q: "What other viruses belong the coronavirus family?",
-	a: "SARS and influenza",
-	b: "SARS and MERS",   // (ANSWER)
-	c: "SARS and HIV",
-	d: "None Of The Above",
-	ans: 2,
-}
 // ******************END OF QUESTIONS AND OPTIONS WITH ANSWERS***************************
 
+qn.sort(function(a, b){return 0.5 - Math.random()});
+var nameofplayer;
+var date;
+
+document.querySelector('.start').addEventListener("click", ()=>{
+	clock();
+	nameofplayer = document.getElementById("name").value;
+	nameofplayer = nameofplayer.toUpperCase();
+	document.querySelector('.quiz').style.display = "initial";
+	document.querySelector('.startcontainer').style.display = "none";
+	document.querySelector('body').classList.remove('bgcolor');
+	date = new Date();
+})
+
 window.onload = printquestion(0);
-window.onload = function() {alert("Options can be selected only once!")};
+// window.onload = function() {alert("Options can be selected only once!")};
 
 function printquestion(n) {
-	n=i;
-	var j = i+1;
-	if (i===0)
+	var j = n+1;
+	if (n===0)
 		document.querySelector('#prev').style.display="none";
 	document.querySelector('.questn').textContent= j + ". " + qn[n].q;
 	document.querySelector('#a').textContent=qn[n].a;
@@ -149,15 +155,6 @@ function next() {
 			document.querySelector('#submit').style.display="initial";
 		}
 		printquestion(i);
-
-		// if(answered[i]===0)
-		// {
-
-		// }
-		// else
-		// {
-		// 	selectedchoice[i].parentElement.classList.remove(classtoapply);
-		// }
 	}
 
 function prev()  {
@@ -179,47 +176,185 @@ function prev()  {
 
 	}
 
-let classtoapply = new Array(11);
+qnnumber.forEach(number => {
+	number.addEventListener('click', e=>{
+		const selectedqnumber = e.target;
+		const n = selectedqnumber.dataset['question']-1;
+
+		i=n;
+		if(n===0)
+			document.querySelector('#prev').style.display="none";
+		if(n>0)
+			document.querySelector('#prev').style.display="initial";
+		if(n===11)
+		{
+			document.querySelector('#next').style.display="none";
+			document.querySelector('#submit').style.display="initial";
+		}
+		if(n<11)
+		{
+			document.querySelector('#next').style.display="initial";
+			document.querySelector('#submit').style.display="none";
+		}
+		printquestion(n);
+	})
+})
+
+let classtoapply;
+var crct = 0;
+var wrng = 0;
 
 choices.forEach(choice => {
 	choice.addEventListener('click', e => {
 		if(answered[i]===0) 
 			return;
-
 		answered[i]--;
 
 		const selectedchoice = e.target;
 		const selectedanswer = selectedchoice.dataset['number'];
 
-		classtoapply[i] = selectedanswer == qn[i].ans ? 'correct' : 'wrong';
+		classtoapply = selectedanswer == qn[i].ans ? 'correct' : 'wrong';
 
-		if (classtoapply[i]==='correct')
+		selectedchoice.parentElement.classList.add(classtoapply);
+
+		if(classtoapply=='correct')
 		{
+			qnnumber[i].parentElement.style["background-color"] = "lime";
 			marks++;
+			crct++;
+		}
+		else
+		{
+			qnnumber[i].parentElement.style["background-color"] = "red";
+			qnnumber[i].parentElement.style.color = "white";
+			wrng++;
 		}
 
-		selectedchoice.parentElement.classList.add(classtoapply[i]);
-
 		setTimeout(() => {
-			selectedchoice.parentElement.classList.remove(classtoapply[i]);
+			selectedchoice.parentElement.classList.remove(classtoapply);
 		},800);
 
 		window.selectedchoice = selectedchoice[i];
 	})
 })
 
+var m = 9;
+var s = 60;
+var ms = 0;
+var ts = 0;
+var tm = 0;
+var watch;
+var clockelement = document.querySelector('.timer');
+
+function clock() {
+	if(!watch)
+	watch = setInterval(run,10);
+}
+
+function run() {
+	clockelement.textContent = (m < 10 ? "0" + m : m) + " min : " + (s < 10 ? "0" + s : s) + " sec";
+	ms++;
+	if(ms==100)
+	{
+		ms = 0;
+		s--;
+	}
+
+	if(s==0)
+	{
+		s=60;
+		m--;
+	}
+
+	if(m==0)
+		undoresultcontainer();
+}
+
 function result() {
 	document.querySelector('.qcontainer').style.display = "none";
 	document.querySelector('footer').style.display = "none";
 	document.querySelector('body').style["background-color"] = "powderblue";
-	document.querySelector('#resulttext').style.fontFamily = "Balsamiq Sans, cursive";
-	document.querySelector('h1').textContent = "QUIZ RESULT";
-	document.querySelector('#resulttext').innerHTML = "YOUR SCORE IS " + "'" + marks + "'";
+	document.querySelector('.sidenav').style.display = "none";
+	document.querySelector('#end').innerHTML = "QUIZ RESULT";
+	document.querySelector('#resulttext').innerHTML = "HI " + nameofplayer + ", YOU HAD SCORED " + "'" + marks + "'" + " POINTS <em>(Time Taken : " + tm + " min " + ts + " sec)</em>";
+
+}
+
+function nostorage() {
+	alert("Sorry, No Web Storage Support...")
+}
+
+var highscorername;
+
+var highscore = 0;
+
+function highscoredetails() {
+	var time = tm + " min " + ts + " sec";
+
+	if(typeof(Storage)!=="undefined")
+	{
+		if(marks>highscore)
+		{
+			highscorername = nameofplayer;
+			highscore = marks;
+			var d = date.getDate();
+			var month = date.getMonth()+1;
+			var yr = date.getFullYear();
+			var hr = date.getHours();
+			var min = date.getMinutes();
+			var sec = date.getSeconds();
+			var hightime = (hr < 10 ? "0" + hr : hr) + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
+			var highdate = d + "/" + month + "/" + yr;
+			localStorage.setItem("highscorername",highscorername);
+			localStorage.setItem("highscore", highscore);
+			localStorage.setItem("datehigh",highdate);
+			localStorage.setItem("hightime", hightime);
+			localStorage.setItem("timetakenhigh",time);
+		}
+	} else {
+		nostorage();
+	}
+
+	document.querySelector('.playerdetails').innerHTML = "'" + localStorage.getItem("highscorername") + "'" + " had scored " + localStorage.getItem("highscore") + " points within " + localStorage.getItem("timetakenhigh") + " on " + localStorage.getItem("datehigh") + " at " + localStorage.getItem("hightime") + "(IST)";
+	
+	
 }
 
 function undoresultcontainer() {
 	document.querySelector('.resultcontainer').style.display = "initial";
+	clearInterval(watch);
+	watch = false;
+	tm = 9-m;
+	ts = 60-s;
+
+	document.querySelector('#resulttext').style.fontFamily = "Noto Serif, serif";
+	document.querySelector('.playerdetails').style.fontFamily = "Noto Serif, serif";
+
+	if(m==9 && s>30)
+		marks*=100;
+	else if(m==9 && s<30)
+		marks*=90;
+	else if(m==8 && s>30)
+		marks*=85;
+	else if(m==8 && s<30)
+		marks*=80;
+	else if(m==7 && s>30)
+		marks*=75;
+	else if(m==7 && s<30)
+		marks*=70;
+	else if(m==6 && s>30)
+		marks*=65;
+	else if(m==6 && s<30)
+		marks*=60;
+	else
+		marks*=50;
+
+	if(crct >= 9&&wrng<=3)
+		marks+=100;
+	else if(crct>5&&wrng<=5)
+		marks+=50;
 	result();
+	highscoredetails();
 }
 
 document.getElementById('submit').addEventListener('click', undoresultcontainer);
