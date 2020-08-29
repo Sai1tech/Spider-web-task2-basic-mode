@@ -108,12 +108,10 @@ nav {
 
 .correct {
 	background-color: green;
-	transition: 0.5s;
 }
 
 .wrong {
 	background-color: red;
-	transition: 0.5s;
 }
 
 h1 {

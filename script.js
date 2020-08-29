@@ -232,7 +232,7 @@ choices.forEach(choice => {
 
 		setTimeout(() => {
 			selectedchoice.parentElement.classList.remove(classtoapply);
-		},800);
+		},400);
 
 		window.selectedchoice = selectedchoice[i];
 	})
