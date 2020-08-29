@@ -202,7 +202,7 @@ choices.forEach(choice => {
 
 		setTimeout(() => {
 			selectedchoice.parentElement.classList.remove(classtoapply[i]);
-		},800);
+		},500);
 
 		window.selectedchoice = selectedchoice[i];
 	})
