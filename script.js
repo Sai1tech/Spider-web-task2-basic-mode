@@ -1,10 +1,13 @@
 var marks=0;
 var i=0;
 var qn = new Array();
+var classtoapply = new Array();
+var crct = 0;
+var wrng = 0;
+var selectedchoice = new Array();
 const choices = Array.from(document.querySelectorAll(".choice"));
 const qnnumber = Array.from(document.querySelectorAll(".qnnumber"));
 var answered = [1,1,1,1,1,1,1,1,1,1,1,1];
-var selectedchoice = new Array();
 window.onload = document.getElementById('submit').style.display = "none";
 window.onload = document.querySelector('.resultcontainer').style.display = "none";
 window.onload = document.querySelector('.quiz').style.display = "none";
@@ -123,18 +126,31 @@ qn.sort(function(a, b){return 0.5 - Math.random()});
 var nameofplayer;
 var date;
 
+function noname(){
+	alert("Please enter your name and proced forward");
+}
+
 document.querySelector('.start').addEventListener("click", ()=>{
-	clock();
+	if(nameofplayer = document.getElementById("name").value=='')
+	{
+		noname();
+		return;
+	}
+	else {
+		clock();
 	nameofplayer = document.getElementById("name").value;
 	nameofplayer = nameofplayer.toUpperCase();
 	document.querySelector('.quiz').style.display = "initial";
 	document.querySelector('.startcontainer').style.display = "none";
 	document.querySelector('body').classList.remove('bgcolor');
 	date = new Date();
+	}
+	
+	
 })
 
 window.onload = printquestion(0);
-// window.onload = function() {alert("Options can be selected only once!")};
+window.onload = function() {alert("Options can be selected only once!")};
 
 function printquestion(n) {
 	var j = n+1;
@@ -148,40 +164,57 @@ function printquestion(n) {
 }
 
 function next() {
-		i++;
-		document.querySelector('#prev').style.display="initial";
-		if(i===11){
-			document.querySelector('#next').style.display="none";
-			document.querySelector('#submit').style.display="initial";
-		}
+	if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.remove(classtoapply[i]);
+
+	i++;
+	if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
+
+	document.querySelector('#prev').style.display="initial";
+	if(i===11){
+		document.querySelector('#next').style.display="none";
+		document.querySelector('#submit').style.display="initial";
+	}
+
+
+
+	printquestion(i);
+
+
+	}
+
+function prev() {
+
+	if (answered[i]==0)
+		selectedchoice[i].parentElement.classList.remove(classtoapply[i]);
+
+	i--;
+	if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
+
+	if(i===0)
+	{
+		document.querySelector('#prev').style.display="none";
 		printquestion(i);
 	}
+	else
+		printquestion(i);
 
-function prev()  {
-		i--;
-
-		if(i===0)
-		{
-			document.querySelector('#prev').style.display="none";
-			printquestion(i);
-		}
-		else
-			printquestion(i);
-
-		if(i===10)
-		{
-			document.querySelector('#next').style.display="initial";
-			document.getElementById('submit').style.display = "none";
-		}
-
+	if(i===10)
+	{
+		document.querySelector('#next').style.display="initial";
+		document.getElementById('submit').style.display = "none";
 	}
+
+}
 
 qnnumber.forEach(number => {
 	number.addEventListener('click', e=>{
 		const selectedqnumber = e.target;
 		const n = selectedqnumber.dataset['question']-1;
-
 		i=n;
+
 		if(n===0)
 			document.querySelector('#prev').style.display="none";
 		if(n>0)
@@ -196,13 +229,25 @@ qnnumber.forEach(number => {
 			document.querySelector('#next').style.display="initial";
 			document.querySelector('#submit').style.display="none";
 		}
+
+		for(var t=0;t<12;t++)
+		{
+			if(t!=n)
+			{
+				if(answered[t]==0)
+					selectedchoice[t].parentElement.classList.remove(classtoapply[t]);
+			}
+			else if(t==n)
+			{
+				if(answered[t]==0)
+					selectedchoice[t].parentElement.classList.add(classtoapply[t]);
+			}
+		}
+
 		printquestion(n);
+		
 	})
 })
-
-let classtoapply;
-var crct = 0;
-var wrng = 0;
 
 choices.forEach(choice => {
 	choice.addEventListener('click', e => {
@@ -210,14 +255,16 @@ choices.forEach(choice => {
 			return;
 		answered[i]--;
 
-		const selectedchoice = e.target;
-		const selectedanswer = selectedchoice.dataset['number'];
+		const answer = qn[i].ans;
 
-		classtoapply = selectedanswer == qn[i].ans ? 'correct' : 'wrong';
+		selectedchoice[i] = e.target;
+		const selectedanswer = selectedchoice[i].dataset['number'];
 
-		selectedchoice.parentElement.classList.add(classtoapply);
+		classtoapply[i] = selectedanswer == answer ? 'correct' : 'wrong';
 
-		if(classtoapply=='correct')
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
+
+		if(classtoapply[i]=='correct')
 		{
 			qnnumber[i].parentElement.style["background-color"] = "lime";
 			marks++;
@@ -230,11 +277,9 @@ choices.forEach(choice => {
 			wrng++;
 		}
 
-		setTimeout(() => {
-			selectedchoice.parentElement.classList.remove(classtoapply);
-		},800);
-
-		window.selectedchoice = selectedchoice[i];
+		// setTimeout(() => {
+		// 	selectedchoice[i].parentElement.classList.remove(classtoapply[i]);
+		// },800);
 	})
 })
 
@@ -324,7 +369,7 @@ function undoresultcontainer() {
 	document.querySelector('.resultcontainer').style.display = "initial";
 	clearInterval(watch);
 	watch = false;
-	tm = 9-m;
+	tm = 10-m;
 	ts = 60-s;
 
 	document.querySelector('#resulttext').style.fontFamily = "Noto Serif, serif";
