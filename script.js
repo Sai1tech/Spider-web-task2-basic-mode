@@ -142,26 +142,29 @@ function printquestion(n) {
 }
 
 function next() {
-		i++;
+		if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.remove(classtoapply[i]);
+
+	i++;
+	if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
+
 		document.querySelector('#prev').style.display="initial";
 		if(i===11){
 			document.querySelector('#next').style.display="none";
 			document.querySelector('#submit').style.display="initial";
 		}
 		printquestion(i);
-
-		// if(answered[i]===0)
-		// {
-
-		// }
-		// else
-		// {
-		// 	selectedchoice[i].parentElement.classList.remove(classtoapply);
-		// }
 	}
 
 function prev()  {
-		i--;
+		if (answered[i]==0)
+		selectedchoice[i].parentElement.classList.remove(classtoapply[i]);
+
+	i--;
+	if(answered[i]==0)
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
+
 
 		if(i===0)
 		{
@@ -179,7 +182,8 @@ function prev()  {
 
 	}
 
-let classtoapply = new Array(11);
+var classtoapply = new Array(11);
+var selectedchoice = new Array();
 
 choices.forEach(choice => {
 	choice.addEventListener('click', e => {
@@ -188,8 +192,8 @@ choices.forEach(choice => {
 
 		answered[i]--;
 
-		const selectedchoice = e.target;
-		const selectedanswer = selectedchoice.dataset['number'];
+		selectedchoice[i] = e.target;
+		const selectedanswer = selectedchoice[i].dataset['number'];
 
 		classtoapply[i] = selectedanswer == qn[i].ans ? 'correct' : 'wrong';
 
@@ -198,13 +202,7 @@ choices.forEach(choice => {
 			marks++;
 		}
 
-		selectedchoice.parentElement.classList.add(classtoapply[i]);
-
-		setTimeout(() => {
-			selectedchoice.parentElement.classList.remove(classtoapply[i]);
-		},400);
-
-		window.selectedchoice = selectedchoice[i];
+		selectedchoice[i].parentElement.classList.add(classtoapply[i]);
 	})
 })
 
